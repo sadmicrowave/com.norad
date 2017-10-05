@@ -1,0 +1,41 @@
+{{ this.loadPartial( 'head.partial.html' ) }}
+
+{{ this.loadPartial( 'nav.partial.html' ) }}
+
+<div class='main-container'>
+	<div class="col-md-12 intro-pane full-width">
+		<center>
+			
+			<span class="glyphicon glyphicon-send" aria-hidden="true"></span>
+			<h2>Welcome to Norad</h2>
+			
+			</br></br>
+			<p class='text'>
+				Are you as excited to begin taking over the world as we are, one custom and innovative Application Programming Interface doubling as a web server based on a NodeJS implementation of NoSQL, hosted on Linux OS, at a time? Great! Let's get started.
+			</p>
+		</center>
+		
+	</div>
+	
+	<div class="col-md-12 full-width">
+		<br/>
+		<center>
+			<div class="panel panel-default activation-token-panel">
+				<div class="panel-heading">
+					<h3 class="panel-title">You're API Token Is:</h3>
+				</div>
+				<div class="panel-footer">
+					<code> {{ this.req.token }} </code>
+				</div>
+			</div>
+			<p class='text'>
+				Keep this API Token documented and secure.  You will use this with any, and all, connections to the Norad API server.		
+			</p>
+		</center>
+	</div>
+</div>
+	
+{{ this.loadPartial( 'footer.partial.html' ) }}
+
+</body>
+</html>

@@ -2,7 +2,7 @@
 // ********************************************* @@@ IMPORTS @@@ ****************************************** //
 // -------------------------------------------------------------------------------------------------------- //
 var  ErrorHandler	          = require('../lib/error.js').ErrorHandler // get individual error handler class for locally thrown errors
-    ,WebServiceOperations 	= require('../core.operations.js').WebServiceOperations 	// file holding main functionality for each web service operation type
+    ,WebServiceOperations 	= require('../cores/operation.core.js').WebServiceOperations 	// file holding main functionality for each web service operation type
 
     ;
 // ------------------------------------------------------------------------------------------------------------- //
@@ -38,5 +38,13 @@ router.route('/:token/help/:option')
        ,ra				= router.authenticate(req.token, callback) // authenticate token, router.authenticate will throw error if not authenticated
        ;
  });
+
+
+
+
+
+
+
+
 
 }

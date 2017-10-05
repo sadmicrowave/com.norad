@@ -53,7 +53,7 @@ sudo apt-get install -y build-essential libssl-dev nodejs npm mongodb-org
 
 # install mongodb driver
 if $VERBOSE; then echo -e '\033[0;33m[+] Installing node.js packages and drivers...\t\033[0m'; fi
-npm install mongodb minimist sendgrid nodemailer 
+npm install mongodb minimist sendgrid nodemailer glob cheerio
 
 
 # create norad user if does not exist
@@ -77,15 +77,17 @@ fi
 
 
 # create the repo directory structure
-if $VERBOSE; then echo -e '\033[0;33m[+] Creating git remote repo directory structure...\033[0m'; fi
-git clone git@gitlab.emerus.com:scripts/norad-api-repo.git ./bin/norad-api-repo.git
+#if $VERBOSE; then echo -e '\033[0;33m[+] Creating git remote repo directory structure...\033[0m'; fi
+#git clone git@gitlab.emerus.com:scripts/norad-api-repo.git ./bin/norad-api-repo.git
 
-
+# copy the upstart script to the /etc/init directory
+#if $VERBOSE; then echo -e '\033[0;33m[+] Copying OS upstart script to /etc/init/...\033[0m'; fi
+#sudo cp $DIR/norad.conf /etc/init/
 
 # return cat of gitlab public key and instructions for uploading to project keys in gitlab
-echo -e '\033[0;33m[+] Finished. \033[0m\n'
-echo -e "Copy the noradapi user public key to the gitlab repository"
-echo -e "'Deploy Keys' area within the 'norad-api-repo' project settings.\n"
-echo "--------copy below this line------------"
-cat /var/opt/norad/.ssh/gitlab.pub
-echo "--------copy above this line------------"
+#echo -e '\033[0;33m[+] Finished. \033[0m\n'
+#echo -e "Copy the noradapi user public key to the gitlab repository"
+#echo -e "'Deploy Keys' area within the 'norad-api-repo' project settings.\n"
+#echo "--------copy below this line------------"
+#cat /var/opt/norad/.ssh/gitlab.pub
+#echo "--------copy above this line------------"

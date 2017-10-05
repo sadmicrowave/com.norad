@@ -41,4 +41,4 @@ irb(main):001:0> response = HTTPI.get(HTTPI::Request.new("http://192.168.18.132:
 ```
 
 #### Credits and Support
-This script was written and maintained by Corey Farmer [corey.farmer@emerus.com].
+This script was written and maintained by Corey Farmer [corey.m.farmer@gmail.com].
