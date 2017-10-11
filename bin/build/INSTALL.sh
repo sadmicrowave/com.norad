@@ -53,7 +53,7 @@ sudo apt-get install -y build-essential libssl-dev nodejs npm mongodb-org
 
 # install mongodb driver
 if $VERBOSE; then echo -e '\033[0;33m[+] Installing node.js packages and drivers...\t\033[0m'; fi
-npm install mongodb minimist sendgrid nodemailer 
+npm install mongodb minimist sendgrid nodemailer glob
 
 
 # create norad user if does not exist
@@ -80,7 +80,9 @@ fi
 if $VERBOSE; then echo -e '\033[0;33m[+] Creating git remote repo directory structure...\033[0m'; fi
 git clone git@gitlab.emerus.com:scripts/norad-api-repo.git ./bin/norad-api-repo.git
 
-
+# copy the upstart script to the /etc/init directory
+if $VERBOSE; then echo -e '\033[0;33m[+] Copying OS upstart script to /etc/init/...\033[0m'; fi
+sudo cp $DIR/norad.conf /etc/init/
 
 # return cat of gitlab public key and instructions for uploading to project keys in gitlab
 echo -e '\033[0;33m[+] Finished. \033[0m\n'

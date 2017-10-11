@@ -2,11 +2,9 @@
 // ********************************************* @@@ IMPORTS @@@ ****************************************** //
 // -------------------------------------------------------------------------------------------------------- //
 var  ErrorHandler	= require('../lib/error.js').ErrorHandler // get individual error handler class for locally thrown errors
-    ,operations 	= require('../core.operations.js') 				// file holding main functionality for each web service operation type
-    ,sys          = require('sys')
-    ,fs           = require('fs')
-    ,exec         = require('child_process').exec
-    ,simpleGit    = require('simple-git')(process.env.GIT_REPO)
+    ,operations 	= require('../cores/operation.core.js') // file holding main functionality for each web service operation type
+    ,fs           	= require('fs')
+    ,simpleGit    	= require('simple-git')(process.env.GIT_REPO)
     ;
 // --------------------------------------------------------------------------------------------------------------- //
 // ********************************************* REGISTER NEW GIT ROUTES ***************************************** //
@@ -30,7 +28,7 @@ router.route('/:token/pull')
                       });
 
                    }
-      ,ra				= router.authenticate(req.token, callback) // authenticate token, router.authenticate will throw error if not authenticated
+      ,ra	= router.authenticate(req.token, callback) // authenticate token, router.authenticate will throw error if not authenticated
      ;
  });
 
@@ -56,7 +54,7 @@ router.route('/:token/getFunctionByName/:option')
                            else return router.submit( data );
                        });
                    }
-     ,ra					= router.authenticate(req.token, callback) // authenticate token, router.authenticate will throw error if not authenticated
+     ,ra	= router.authenticate(req.token, callback) // authenticate token, router.authenticate will throw error if not authenticated
      ;
  });
 

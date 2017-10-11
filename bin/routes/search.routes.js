@@ -2,7 +2,7 @@
 // ********************************************* @@@ IMPORTS @@@ ****************************************** //
 // -------------------------------------------------------------------------------------------------------- //
 var  ErrorHandler	= require('../lib/error.js').ErrorHandler // get individual error handler class for locally thrown errors
-    ,operations 	= require('../core.operations.js') 				// file holding main functionality for each web service operation type
+    ,operations 	= require('../cores/operation.core.js')  // file holding main functionality for each web service operation type
     ;
 // --------------------------------------------------------------------------------------------------------------- //
 // ********************************************* REGISTER NEW SEARCH ROUTES ************************************** //
@@ -28,7 +28,7 @@ router.route('/:token/search')
                      }
                      return router.submit(arr);
                    }
-     ,ra					= router.authenticate(req.token, callback) // authenticate token, router.authenticate will throw error if not authenticated
+     ,ra 	= router.authenticate(req.token, callback) // authenticate token, router.authenticate will throw error if not authenticated
      ;
  });
 

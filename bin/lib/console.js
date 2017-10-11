@@ -22,14 +22,14 @@ by writing to stdout.
     ;
 
 // define the log path and file access options
- var  filename	 = 'com.sadmicrowave.norad.log'
- 	 ,path		 = '{0}/var/log'.format(process.cwd())
+ var  filename = 'com.sadmicrowave.norad.log'
+ 	 ,path		   = '{0}/var/log'.format(process.cwd())
  	 ,filepath	 = '{0}/{1}'.format(path, filename)
  	 ,logFile 	 = fs.createWriteStream(filepath, {flags : 'w'}) // define log location and file type
- 	 ,fstats	 = fs.statSync(filepath)
+ 	 ,fstats	   = fs.statSync(filepath)
  	 //,logStdout  = process.stdout // redirect stdout to variable
- 	 ,elog 		 = console.log
- 	 ,d 		 = new Date() // create date object used in datestamping log entries
+ 	 ,elog 		   = console.log
+ 	 ,d 		     = new Date() // create date object used in datestamping log entries
  	 ,maxBytes 	 = 100000 // max file size in bytes before file rotation creates a new file
  	 ,maxFiles	 = 5
 	 ;
