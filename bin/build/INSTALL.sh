@@ -55,7 +55,6 @@ sudo apt-get install -y build-essential libssl-dev nodejs npm mongodb-org
 if $VERBOSE; then echo -e '\033[0;33m[+] Installing node.js packages and drivers...\t\033[0m'; fi
 npm install mongodb minimist sendgrid nodemailer glob cheerio
 
-
 # create norad user if does not exist
 if [ ! $(id -u noradapi) ]; then
   # make a new user for this specific api engine

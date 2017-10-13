@@ -6,6 +6,7 @@ var EventEmitter 			= require('events').EventEmitter 			// core module for creat
 	,http 					= require('http') 							// get the http module to start the tcp POST listener
 	,querystring			= require('querystring')
 	,fs 					= require('fs')
+	,sys					= require('sys')
 	,exec					= require('child_process').exec
 	,util 					= require('util')
 	,minimist				= require('minimist')					// library for parsing command line arguments
