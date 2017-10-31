@@ -20,7 +20,7 @@ router.route('/contact')
 	// -----------------------------
 	// Return the contact page
 	// -----------------------------
-	.get(function(err,req,res){ 
+	/*.get(function(err,req,res){ 
 	 	if ( err ) router.error( Error(err) );
 	
 	    fs.readFile(__dirname + '/../views/contact.blade.html', 'utf-8', function(err, data){
@@ -32,7 +32,7 @@ router.route('/contact')
 			
 		});
 	
-	 })
+	 })*/
 	 // -----------------------------
 	 // Create and send new contact ticket
 	 // -----------------------------
@@ -43,10 +43,14 @@ router.route('/contact')
 		var  useremail = req.params && req.params.email !== undefined && req.params.email.length
 						? req.params.email.toLowerCase()
 						: router.error( ErrorHandler('Contact Email Not Provided.', 'Unauthorized', 401) )
-  			// ensure password is provided with registration parameters
+  			// ensure message is included in contact form
   			,message	= req.params && req.params.message !== undefined && req.params.message.length
 						? req.params.message
 						: router.error( ErrorHandler('Contact Message Not Provided.', 'Unauthorized', 401) )
+			// ensure name is include in the contact form
+			,name		= req.params && req.params.name !== undefined && req.params.name.length
+						? req.params.name
+						: router.error( ErrorHandler('Contact Name Not Provided.', 'Unauthorized', 401) )
 			,r = {'email': useremail}
 			,scallback 	= function(){ return router.submit(r) }
 			,dt			= new Date().getTime()
@@ -66,6 +70,7 @@ router.route('/contact')
 								,'method'				:	req.method
 								,'bytesRead'			:	req.client['bytesRead']
 								,'message'				: 	message
+								,'sumitter-name'		:   name
 								,'submitter-email'		:	useremail
 								,'created'				:	dt
 							}, 

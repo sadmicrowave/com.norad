@@ -1,0 +1,15 @@
+{
+    "name": "server-api",
+    "main": "server.js",
+    "dependencies": {
+        "@sendgrid/mail": "^6.1.4",
+        "cheerio": "",
+        "minimist": "",
+        "mongodb": "",
+        "request": "^2.83.0",
+        "sendgrid": "",
+        "sendgrid-web": "0.0.5",
+        "simple-git": "",
+        "jwt-simple":""
+    }
+}

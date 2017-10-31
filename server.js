@@ -6,7 +6,6 @@ var EventEmitter 			= require('events').EventEmitter 			// core module for creat
 	,http 					= require('http') 							// get the http module to start the tcp POST listener
 	,querystring			= require('querystring')
 	,fs 					= require('fs')
-	,sys					= require('sys')
 	,exec					= require('child_process').exec
 	,util 					= require('util')
 	,minimist				= require('minimist')					// library for parsing command line arguments
@@ -28,6 +27,7 @@ process.env.WEBROOT		= __dirname + '/public'; // base directory name of the serv
 process.env.GIT_REPO	= __dirname + '/bin/norad-api-repo.git'; // set the git repo holding all files for lookup
 process.env.WIKI		= 'http://wiki.norad.com'; // set the url path for API wiki documentation
 process.env.ADMIN		= 'corey.m.farmer@gmail.com'; // set the process admin email address
+process.env.FQDN		= 'localhost' // set the fully qualified domain name used for the server address
 
 /* Build the main function of the script which holds all actions
 	and variables for execution.  This function will be extended
@@ -87,7 +87,7 @@ Norad.prototype.start = function() {
 	/* Everything within this start impelementation is dedicated to the server object with request and reponse types.
 		Here we handle the request and response objects and their corresponding actions and events
 	*/
-	var  routeapi 	 = routes.RegisterRoutes(); // register all avaialble routes
+	var  router 	 = routes.RegisterRoutes(); // register all avaialble routes
 	/*const ssloptions = {
 	  'key': fs.readFileSync('./bin/ssl/emerus2017_key.pem'),
 	  'cert': fs.readFileSync('./bin/ssl/emerus2017_cert.pem')
@@ -112,17 +112,21 @@ Norad.prototype.start = function() {
 			 	try {
 				 	// at this point, `body` has the entire request body stored in it as a string
 				 	body = Buffer.concat(body);
-				 		
-				 	//console.log( request.connection.remoteAddress, request.headers, request.url );
-					// execute the main router functionality and parse the http request, and determine which route to use and execute
-					routeapi.use(request, response, body.toString());
-
+				 	
+					var callback = function (request, response, body) {
+						// execute the main router functionality and parse the http request, and determine which route to use and execute
+						router.use(request, response, body.toString());
+					}
+					
+					// add log in access log for accessing api server
+					router.access(request, response, body, callback);
+					
 				} catch (e) {
 					// provide a status code if one is not already present in the error object
 					e.statusCode = e.statusCode || 501;
 					// throw an error to the response error event listener
 					// provide an error and code back as a response
-					routeapi.error(e);
+					router.error(e);
 				}
 
 			}).on('error', function(e) {
@@ -132,7 +136,7 @@ Norad.prototype.start = function() {
 				   if you just log it and continue on your way.
 				*/
 			 	// provide an error and code back as a response
-				routeapi.error(e);
+				router.error(e);
 			});
 
 
@@ -157,6 +161,10 @@ Norad.prototype.start = function() {
 								,{	 'Content-Type'	: 'text/html; charset=UTF-8'
 									,'Pragma'		: 'no-cache'
 									,'ETag'			: checksum( JSON.stringify( _response_ || {} ), 'SHA256', 'base64' )
+									,'Access-Control-Allow-Origin': 'http://localhost'
+									,'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE'
+									,'Access-Control-Allow-Headers': 'X-Requested-With,content-type'
+									,'Access-Control-Allow-Credentials': true
 								}
 							);
 			
@@ -167,13 +175,27 @@ Norad.prototype.start = function() {
 			// so stringify the results to a json object for returned CLI readbility
 			if ( _response_ instanceof Object )
 				_response_ = JSON.stringify(_response_ || '');
-				
+			/*
+			// Website you wish to allow to connect
+		    response.setHeader('Access-Control-Allow-Origin', 'http://localhost');
+		
+		    // Request methods you wish to allow
+		    response.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+		
+		    // Request headers you wish to allow
+		    response.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+		
+		    // Set to true if you need the website to include cookies in the requests sent
+		    // to the API (e.g. in case you use sessions)
+		    response.setHeader('Access-Control-Allow-Credentials', true);
+			*/
+			
 			// write response back to caller through server object
 			response.end( _response_ || '' ); //JSON.stringify( _response_ || '')
 		});
 	}).listen( this.port ); // chained to server object tell the server object to begin listening on defined port
 
-	console.log( '[+] API Server Object Started :{0}'.format(this.port) );
+	console.log( '[+] API Server Object Started on Port :{0}'.format(this.port) );
 }
 
 
@@ -204,7 +226,7 @@ try {
 	  	f(err);
 	})
 	.on('SIGTERM', function(){
-			f();
+		f();
 	});
 
 	// Instantiate and start the listener

@@ -23,12 +23,8 @@ router.route('/users')
 	.post(function(err,req,res){
 		if ( err ) router.error( Error(err) );
 
-  			 // ensure name is provided with registration parameters
-		var  username = req.params && req.params.username !== undefined && req.params.username.length
-						? req.params.username.toUpperCase()
-						: router.error( ErrorHandler('Registration Name Not Provided.', 'Unauthorized', 401) )
-  			// ensure email is provided with registration parameters
-  			,useremail = req.params && req.params.email !== undefined && req.params.email.length
+		var // ensure email is provided with registration parameters
+  			useremail = req.params && req.params.email !== undefined && req.params.email.length
 						? req.params.email.toLowerCase()
 						: router.error( ErrorHandler('Registration Email Not Provided.', 'Unauthorized', 401) )
   			// ensure password is provided with registration parameters
@@ -40,7 +36,7 @@ router.route('/users')
 	                    : null
   			;
 		// if statement used to prevent script from continuing if router returned result to user already
-		if ( ! username || ! useremail || ! password ) return false;
+		if ( ! useremail || ! password ) return false;
 
 		// create the json web token (JWT)
 		var iat		    = new Date().getTime() 	// epoch time at which JWT was initiated
@@ -50,47 +46,50 @@ router.route('/users')
 	  												})
 	  								).toString('base64')
 			,payload 	= new Buffer(JSON.stringify({'iss'	: 'sadmicrowave.com'
-	  												,'name'	: username
 	  												,'pass'	: userpass
 	  												,'iat'	: iat
 	  												,'email': useremail
   												})
 								).toString('base64')
-			,token	  	= crypto.createHmac('SHA256', process.env.SHA_SECRET).update( header + payload ).digest('hex') //.replace(/\//g, '+') // hash token header and payload to create unique token
+			//,token	  	= crypto.createHmac('SHA256', process.env.SHA_SECRET).update( header + payload ).digest('hex') //.replace(/\//g, '+') // hash token header and payload to create unique token
+			
 			,activation_key = crypto.createHmac('SHA256', process.env.SHA_SECRET).update( payload ).digest('hex') //.replace(/\//g, '+') // hash payload to create unique activation key, different from authentication token
 			//,jwt	    = '{0}.{1}.{2}'.format(header,payload,secret) // create entire jwt standard api token
 			,callback 	= function(err, coll){
                 if ( err ) router.error( Error(err) );
-				coll.insert({ 	 'username'	: username
-								,'email'	: useremail
+				coll.insert({ 	 //'username'	: username
+								 'email'	: useremail
 								,'pass'		: userpass
-								,'jwt'		: token
-								,'header'	: header
-								,'payload'	: payload
+								//,'jwt'		: token
+								//,'header'	: header
+								//,'payload'	: payload
                                 ,'total_req': 0
                                 ,'threshold_req': 0
                                 ,'threshold_start_time': 0
                                 ,'ak'     	: activation_key
-                                ,'activated': adminpass == process.env.SHA_SECRET ? true : false
-                                ,'adm'    	: adminpass == process.env.SHA_SECRET ? true : false
+                                //,'activated': adminpass == process.env.SHA_SECRET ? true : false
+                                //,'adm'    	: adminpass == process.env.SHA_SECRET ? true : false
+                                ,'activated': false
+                                ,'adm'    	: false
                                 ,'iat'		: iat
 								,'created'	: iat
                                 ,'modified'	: iat
 							}
-							,function(err, res){
-								if ( err.code == 11000 ) return router.error( ErrorHandler('User already exists.', 'Conflict', 409) )
+							,function(err, writeResults){
+								console.log( writeResults );
+								if ( err && err.code == 11000 ) return router.error( ErrorHandler('User already exists.', 'Conflict', 409) )
 								if ( err ) return router.error( Error(err) );
-				              	var r = {'id': res.ops[0].username
-					              		,'email': res.ops[0].email
+				              	var r = {'email': writeResults.ops[0].email
+					              		,'Response':'Your activation code has been emailed to the address used in registration. Please check your email and follow the instructions for account activation.'
 				              			}
-				              			.extend(
-				              				adminpass == process.env.SHA_SECRET
+				              			/*.extend(adminpass == process.env.SHA_SECRET
 							                    ? {'apitoken': token}
 							                    : {'Response':'Your activation code has been emailed to the address used in registration. Please check your email and follow the instructions for account activation.'}
 												)
+										*/
 					                ,scallback = function(){ return router.submit(r) }
 									// send the activation email to the user
-								    ,res = ActivationEmail(useremail, activation_key, scallback, router)
+								    ,res = ActivationEmail(activation_key, useremail, scallback, router)
 								    ;
 								if ( res instanceof Error ) router.error( Error(err) );
 							}
@@ -114,11 +113,11 @@ router.route('/users')
 	.get(function(err,req,res){
 		if ( err ) router.error( Error(err) );
 	
-		console.log( req.params );
 	    // the text 'activate' was passed after user path element
 	    var ak = req.params && req.params.ak !== undefined && req.params.ak.length
                   ? req.params.ak
                   : router.error( ErrorHandler('No Function Path for Supplied API Argument.', 'Bad Request', 400) )
+	        ,iat = new Date().getTime()
 	        ;
 	    // if statement used to prevent script from continuing if router returned result to user already
 	    if ( ! ak ) return false;
@@ -131,20 +130,29 @@ router.route('/users')
 	                                           	//	,'activated' : false
 	                                        }
 	                                        ,{ $set  : { 'activated': true
-	                                                    ,'modified' : new Date().getTime()
+		                                        		,'activated_on': iat
+	                                                    ,'modified' : iat
 	                                                  }
 	                                        }, function(err, doc){
 				                                if ( err ) return router.error( Error(err) );
 				                                if ( doc.value == null ) return router.error( ErrorHandler('User Does Not Exist!', 'Bad Request', 400) );
-			                                	fs.readFile(__dirname + '/../views/activation.blade.html', 'utf-8', function(err, data){
+			                                	var r = {'email': writeResults.ops[0].email
+														,'Response':'Your account is now activated'
+						              				}
+						              			
+									  			return router.submit(r);
+			                                	
+			                                	/*fs.readFile(__dirname + '/../views/activation.blade.html', 'utf-8', function(err, data){
 				                                	if (err) return router.error( Error(err) );
 													req.token = doc.value.jwt;
 													var html 	= HTML(req, res)
 														,page 	= html.render(err, data)
 														;
+													
+													
 													return router.submit( page, false ); //buffer.toString('utf-8', activationBlade)
 													
-												});	
+												});	*/
 	                          				}
 	                          				);
 	                      });

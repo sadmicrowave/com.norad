@@ -1,3 +1,6 @@
 norad-api-repo.git
 DS_Store*
 *.log*
+
+// Ignore config file to prevent passwords and keys on github
+config.js
